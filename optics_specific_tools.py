@@ -2,7 +2,7 @@ import pymask as pm
 import numpy as np
 import pandas as pd
 import fillingpatterns as fp
-
+import os
 # The parts marked by (*) in following need to be
 # adapted according to knob definitions
 
@@ -25,13 +25,14 @@ def get_python_parameters(job_row):
         'emittance_um' : 2.5,}
 
     if job_row is None:
-        python_parameters["parent_folder"]='.'
+        python_parameters["parent_folder"]=os.getcwd()
+        python_parameters['working_folder']=python_parameters['parent_folder']+'/'+python_parameters['working_folder']
 		
     if job_row is not None:
-        python_parameters['working_folder']=python_parameters['parent_folder']+'/'+job_row['working_folder']
         python_parameters['mode']=job_row['mode']
         python_parameters['optics_file']=job_row['optics_file']
         python_parameters['parent_folder']=job_row['parent_folder']
+        python_parameters['working_folder']=python_parameters['parent_folder']+'/'+job_row['working_folder']
 
 
     patt = fp.FillingPattern.from_json(f'{python_parameters["parent_folder"]}/input_{python_parameters["filling_pattern"]}.json')
