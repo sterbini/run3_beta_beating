@@ -15,19 +15,19 @@ for optics, mode, in product(range(20,32), ['b1_with_bb','b4_from_b2_with_bb']):
         'optics_file' : f'opticsfile.{optics}',
         })
 
-pd.DataFrame(my_list).to_pickle('jobs_df.pickle')
+pd.DataFrame(my_list).to_pickle('input_jobs_df.pickle')
 
 
 mypath=os.getcwd()
-python_script=mypath+'/000_pymask.py'
-python_dataframe=mypath+'/jobs_df.pickle'
+python_script=mypath+'/000_job.py'
+python_dataframe=mypath+'/input_jobs_df.pickle'
 python_distribution='/afs/cern.ch/eng/tracking-tools/python_installations/activate_default_python'
 
 
-myStudy = StudyObj(name='test',\
-                   path=mypath,\
-                   python_script=python_script,\
-                   python_distribution=python_distribution,\
+myStudy = StudyObj(name='test',
+		   path=mypath,
+                   python_script=python_script,
+                   python_distribution=python_distribution,
                    python_dataframe=python_dataframe,
                    arguments='$(ProcId)', queue=len(pd.read_pickle(python_dataframe)))
 

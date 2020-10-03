@@ -31,7 +31,7 @@ def get_python_parameters(python_parameters, job_row):
         python_parameters['optics_file']=job_row['optics_file']
 
 
-    patt = fp.FillingPattern.from_json(f'{python_parameters["parent_folder"]}/data/{python_parameters["filling_pattern"]}.json')
+    patt = fp.FillingPattern.from_json(f'{python_parameters["parent_folder"]}/input_{python_parameters["filling_pattern"]}.json')
 
     python_parameters['filling_pattern_handle']=patt
     python_parameters['filling_pattern_handle'].compute_beam_beam_schedule(n_lr_per_side=20)
@@ -47,16 +47,16 @@ def get_python_parameters(python_parameters, job_row):
 def sigma_from_tables(optics_file, emittance_um, filling_scheme, parent_folder):
     if filling_scheme=='filling_scheme_mixed':
         if emittance_um==1.8:
-            sigma_df=pd.read_pickle(f'{parent_folder}/data/params_2484_1.8.pickle')
+            sigma_df=pd.read_pickle(f'{parent_folder}/input_params_2484_1.8.pickle')
         elif emittance_um==2.5:
-            sigma_df=pd.read_pickle(f'{parent_folder}/data/params_2484_2.5.pickle')
+            sigma_df=pd.read_pickle(f'{parent_folder}/input_params_2484_2.5.pickle')
         else:
             assert False
     elif filling_scheme=='filling_scheme_bcms':
         if emittance_um==1.8:
-            sigma_df=pd.read_pickle(f'{parent_folder}/data/params_2736_1.8.pickle')
+            sigma_df=pd.read_pickle(f'{parent_folder}/input_params_2736_1.8.pickle')
         elif emittance_um==2.5:
-            sigma_df=pd.read_pickle(f'{parent_folder}/data/params_2736_2.5.pickle')
+            sigma_df=pd.read_pickle(f'{parent_folder}/input_params_2736_2.5.pickle')
         else:
             assert False
     else:
