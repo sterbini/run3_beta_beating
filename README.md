@@ -18,13 +18,13 @@ git clone https://github.com/sterbini/run3_beta_beating.git
 ### Single job test
 ```
 source /afs/cern.ch/eng/tracking-tools/python_installations/activate_default_python
-python 000_pymask.py
+python 000_job.py
 ```
 
 ### Multiple jobs
 You can run multiple jobs on HTCondor by
 ```
-python launch_jobs.py  
+python 001_jobs.py  
 ```
 
 ### Postprocessing
