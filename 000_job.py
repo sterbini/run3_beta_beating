@@ -18,6 +18,7 @@ import optics_specific_tools as ost
 
 
 python_parameters={'parent_folder': os.getcwd()}
+sys.path.append(python_parameters['parent_folder'])# to read local data
 python_parameters=ost.get_python_parameters(python_parameters,job_row)
 mask_parameters=ost.get_mask_parameters(python_parameters)
 knob_parameters=ost.get_knob_parameters()
