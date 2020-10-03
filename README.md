@@ -12,10 +12,20 @@ ssh lxplus.cern.ch
 clone this repository in your current folder
 
 ```
-git clone 
+git clone https://github.com/sterbini/run3_beta_beating.git
 ```
 
-
+### Single job test
 ```
 source /afs/cern.ch/eng/tracking-tools/python_installations/activate_default_python
+python 000_pymask.py
 ```
+
+### Multiple jobs
+You can run multiple jobs on HTCondor by
+```
+python launch_jobs.py  
+```
+
+### Postprocessing
+You can do some postprocessing on SWAN.
