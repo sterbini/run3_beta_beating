@@ -417,7 +417,7 @@ twiss_dfs, other_data = ost.twiss_with_no_use(mad_track, [sequence_to_track],
         check_betas_at_ips=False, check_separations_at_ips=False)
 
 mad_track.globals['on_bb_charge']=1
-pd.DataFrame([mad_track.globals]).to_parquet('final_globals.parquet')
+pd.DataFrame([mad_track.globals]).to_parquet(python_parameters['working_folder']+'/final_globals.parquet')
 
 my_variables=mad_track.get_variables_dataframes()
 
