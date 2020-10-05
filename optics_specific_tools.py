@@ -366,8 +366,9 @@ def check_separations_at_ips_against_madvars(twiss_df_b1, twiss_df_b2,
 
 def twiss_and_check(mad, sequences_to_check, twiss_fname,
         tol_beta=1e-3, tol_sep=1e-6, save_twiss_files=True,
-        check_betas_at_ips=True, check_separations_at_ips=True):
-
+        check_betas_at_ips=True, check_separations_at_ips=True, remove_drifts=True, columns_to_save=['name', 's',
+            'keyword', 'parent', 'x', 'y', 'px', 'py', 'dx', 'dy', 'dpx', 'dpy', 'betx', 'bety', 'alfx', 'alfy', 
+            'mux','muy', 'k0l', 'k1l', 'k2l', 'k3l', 'k0sl', 'k1sl', 'k2sl', 'k3sl']):
     var_dict = mad.get_variables_dicts()
     twiss_dfs = {}
     summ_dfs = {}
@@ -382,6 +383,12 @@ def twiss_and_check(mad, sequences_to_check, twiss_fname,
     if save_twiss_files:
         for ss in sequences_to_check:
             tt = twiss_dfs[ss]
+            try:
+                tt=tt[columns_to_save]
+            except:
+                print("Check the columns_to_save, there was a problem...")
+            if remove_drifts:
+                tt=tt[tt['keyword']!='drift']
             if twiss_fname is not None:
                 tt.to_parquet(twiss_fname + f'_seq_{ss}.parquet')
 
@@ -409,7 +416,9 @@ def twiss_and_check(mad, sequences_to_check, twiss_fname,
 
 def twiss_with_no_use(mad, sequences_to_check, twiss_fname,
         tol_beta=1e-3, tol_sep=1e-6, save_twiss_files=True,
-        check_betas_at_ips=True, check_separations_at_ips=True):
+        check_betas_at_ips=True, check_separations_at_ips=True, remove_drifts=True, columns_to_save=['name', 's', 
+            'keyword', 'parent', 'x', 'y', 'px', 'py', 'dx', 'dy', 'dpx', 'dpy', 'betx', 'bety', 'alfx', 'alfy', 
+            'mux','muy', 'k0l', 'k1l', 'k2l', 'k3l', 'k0sl', 'k1sl', 'k2sl', 'k3sl']):
 
     var_dict = mad.get_variables_dicts()
     twiss_dfs = {}
@@ -424,6 +433,12 @@ def twiss_with_no_use(mad, sequences_to_check, twiss_fname,
     if save_twiss_files:
         for ss in sequences_to_check:
             tt = twiss_dfs[ss]
+            try:
+                tt=tt[columns_to_save]
+            except:
+                print("Check the columns_to_save, there was a problem...")
+            if remove_drifts:
+                tt=tt[tt['keyword']!='drift']
             summary_df = summ_dfs[ss]
             if twiss_fname is not None:
                 tt.to_parquet(twiss_fname + f'_seq_{ss}.parquet')
