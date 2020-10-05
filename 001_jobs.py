@@ -11,7 +11,7 @@ from itertools import product
 for optics, mode, in product(range(20,32), ['b1_with_bb','b4_from_b2_with_bb']):
     my_list.append({
         'parent_folder': os.getcwd(),
-	'working_folder': f'{mode[0:2]}_optics_{optics}_mixed_18',
+	'working_folder': f'{mode[0:2]}_optics_{optics}_mixed_25',
         'mode' : mode,
         'optics_file' : f'opticsfile.{optics}',
         })
