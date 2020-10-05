@@ -429,6 +429,11 @@ my_variables['dependent_variables'].to_parquet('final_dependent_variables.parque
 pd.DataFrame([python_parameters]).to_pickle('final_python_parameters.pickle')
 pd.DataFrame([mask_parameters]).to_pickle('final_mask_parameters.pickle')
 pd.DataFrame([knob_parameters]).to_pickle('final_knob_parameters.pickle')
+
+import glob
+for f in glob.glob("*.tfs"):
+    os.remove(f)
+
 os.chdir(python_parameters['parent_folder'])
 
 # Generate sixtrack
