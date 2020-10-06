@@ -157,7 +157,7 @@ def get_knob_parameters():
     'par_x2h'               : 0,
     'par_x2v'               : 200,
     'par_sep8h'             : 0,
-    'par_sep8v'             : 1,
+    'par_sep8v'             : -1,
     'par_x8h'               : -250,
     'par_x8v'               : 0,
 

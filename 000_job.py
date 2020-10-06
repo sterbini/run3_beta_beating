@@ -202,10 +202,12 @@ else:
     sigma_x_b1_ip8=np.sqrt(twiss_dfs['lhcb1'].loc['ip8:1'].betx*mad.sequence.lhcb1.beam.ex)
     optres_ip8=least_squares(function_to_minimize_ip8, sigma_x_b1_ip8)
     mad.globals['on_sep8v'] = np.sign(mad.globals['on_sep8v']) * np.abs(optres_ip8['x'][0])*1e3
+    knob_parameters['par_sep8v']=mad.globals['on_sep8v']
 
     # Halo collision in IP2
     sigma_y_b1_ip2=np.sqrt(twiss_dfs['lhcb1'].loc['ip2:1'].bety*mad.sequence.lhcb1.beam.ey)
     mad.globals['on_sep2h']=np.sign(mad.globals['on_sep2h'])*mask_parameters['par_fullsep_in_sigmas_ip2']*sigma_y_b1_ip2/2*1e3
+    knob_parameters['par_sep2h']=mad.globals['on_sep2h']
 
     # Re-save knobs
     mad.input('exec, crossing_save')
@@ -220,7 +222,8 @@ else:
     lumi.print_luminosity(mad, twiss_dfs,
             mask_parameters['par_nco_IP1'], mask_parameters['par_nco_IP2'],
             mask_parameters['par_nco_IP5'], mask_parameters['par_nco_IP8'])
-    
+
+    prrrr    
     import pandas as pd
     for ii in [1,2,5,8]:
         pd.DataFrame([lumi.get_luminosity_dict(mad, twiss_dfs, f'ip{ii}', mask_parameters[f'par_nco_IP{ii}'])]).to_parquet(f'lumi_dict_ip{ii}.parquet')
