@@ -82,7 +82,7 @@ def get_mask_parameters(python_parameters):
     # Settings
     'par_oct_current'          : 350.,         # [A]
     'par_chromaticity'         : 15.,            # [-] (Q':5 for colliding bunches, Q':15 for non-colliding bunches)
-    'par_vrf_total'            : 16.,          # [MV]
+    'par_vrf_total'            : 12.,          # [MV]
 
     # Tunes
     'par_qx0'                  : 62.313,
@@ -268,7 +268,7 @@ def build_sequence(mad, beam):
         mad.beam()
         for my_sequence in ['lhcb1','lhcb2']:
             if my_sequence in list(mad.sequence):
-                mad.input(f'use, sequence={my_sequence}; makethin, sequence={my_sequence}, style=teapot, makedipedge=false;')
+                mad.input(f'use, sequence={my_sequence}; makethin, sequence={my_sequence}, style=teapot, makedipedge=true;')
     else:
         warnings.warn('The sequences are not thin!')
 
