@@ -33,8 +33,8 @@ if len(sys.argv) > 1:
     shutil.copyfile(sys.argv[1],'./input_jobs_df.pickle')
     pm.make_links(force=True, links_dict={
     'parent_folder': python_parameters['parent_folder']})
-    for f in glob.glob('parent_folder/*.py'):
-        shutil.copyfile('parent_folder/'+f, f)
+    for ff in glob.glob('parent_folder/*.py'):
+	shutil.copyfile(ff, os.path.split(ff)[1])
 
 Madx = pm.Madxp
 
