@@ -3,20 +3,28 @@ import pyHTC.toolkit as toolkit
 import os
 import pandas as pd
 import sys
+from datetime import datetime
+
+now = datetime.now()
+
+
+date_string = now.strftime("%Y.%m.%d.%H.%M.%S")
 
 my_list=[]
 
 from itertools import product
 
-for optics, mode, in product(range(20,32), ['b1_with_bb','b4_from_b2_with_bb']):
+for optics, mode, emittance in product(range(20,32), ['b1_with_bb','b4_from_b2_with_bb'], [2.5]):
     my_list.append({
         'parent_folder': os.getcwd(),
-	'working_folder': f'{mode[0:2]}_optics_{optics}_mixed_25',
+	'working_folder': f'/eos/user/g/gsterb/run3_beta_beating/{date_string}_{mode[0:2]}_optics_{optics}_mixed_{emittance}',
         'mode' : mode,
         'optics_file' : f'opticsfile.{optics}',
+	'emittance_um': emittance,
+	'date_string':date_string,
         })
 
-pd.DataFrame(my_list).to_pickle('./data/input_jobs_df.pickle')
+pd.DataFrame(my_list).to_pickle(f'./data/input_jobs_df.pickle')
 
 
 mypath=os.getcwd()

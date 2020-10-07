@@ -3,8 +3,11 @@ import numpy as np
 import pandas as pd
 import fillingpatterns as fp
 import os
+from datetime import datetime
 # The parts marked by (*) in following need to be
 # adapted according to knob definitions
+
+now = datetime.now()
 
 def get_python_parameters(job_row):
     python_parameters= {
@@ -22,7 +25,10 @@ def get_python_parameters(job_row):
         # tolerance for the sanity check of the flat orbit machine
         'flat_tol' : 1e-6,
         'lumi_levelling_ip15' : True,
-        'emittance_um' : 2.5,}
+        'emittance_um' : 2.5,
+        'clipped_intensity': True,
+    	'date_string': now.strftime("%Y.%m.%d.%H.%M.%S"), 
+    }
 
     if job_row is None:
         python_parameters["parent_folder"]=os.getcwd()
@@ -32,7 +38,9 @@ def get_python_parameters(job_row):
         python_parameters['mode']=job_row['mode']
         python_parameters['optics_file']=job_row['optics_file']
         python_parameters['parent_folder']=job_row['parent_folder']
-        python_parameters['working_folder']=python_parameters['parent_folder']+'/'+job_row['working_folder']
+        python_parameters['emittance_um']=job_row['emittance_um']
+        python_parameters['working_folder']=job_row['working_folder']
+        python_parameters['date_string']=job_row['date_string']
 
 
     patt = fp.FillingPattern.from_json(f'{python_parameters["parent_folder"]}/data/input_{python_parameters["filling_pattern"]}.json')
@@ -157,7 +165,7 @@ def get_knob_parameters():
     'par_x2h'               : 0,
     'par_x2v'               : 200,
     'par_sep8h'             : 0,
-    'par_sep8v'             : 1,
+    'par_sep8v'             : -1,
     'par_x8h'               : -250,
     'par_x8v'               : 0,
 

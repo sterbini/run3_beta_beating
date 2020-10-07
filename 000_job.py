@@ -2,6 +2,8 @@ import sys, os
 import pickle
 import numpy as np
 import pandas as pd
+import glob
+import shutil
 
 if len(sys.argv) > 1:
     job_df = pd.read_pickle(sys.argv[1])
@@ -25,6 +27,14 @@ directory=python_parameters['working_folder']
 if not os.path.exists(directory):
     os.makedirs(directory)
 os.chdir(directory)
+
+# make a local copy in the job's folder of the jobs df and py files
+if len(sys.argv) > 1:
+    shutil.copyfile(sys.argv[1],'./input_jobs_df.pickle')
+    pm.make_links(force=True, links_dict={
+    'parent_folder': python_parameters['parent_folder']})
+    for f in glob.glob('parent_folder/*.py'):
+        shutil.copyfile('parent_folder/'+f, f)
 
 Madx = pm.Madxp
 
@@ -181,9 +191,13 @@ else:
     
     if python_parameters['lumi_levelling_ip15']:
         aux=least_squares(function_to_minimize_IP15, starting_guess)
-        mad.sequence.lhcb1.beam.npart=aux['x'][0]
-        mad.sequence.lhcb2.beam.npart=aux['x'][0]
-        mask_parameters['par_beam_npart']=aux['x'][0]
+        if python_parameters['clipped_intensity']:
+            my_npart=np.min([1.8e11,aux['x'][0]])
+        else:
+            my_npart=aux['x'][0]
+        mad.sequence.lhcb1.beam.npart=my_npart
+        mad.sequence.lhcb2.beam.npart=my_npart
+        mask_parameters['par_beam_npart']=my_npart
     
     knob_parameters['par_x1']=crossing_angle
     knob_parameters['par_x5']=crossing_angle
@@ -196,16 +210,18 @@ else:
     def function_to_minimize_ip8(sep8v_m):
         my_dict_IP8=lumi.get_luminosity_dict(
             mad, twiss_dfs, 'ip8', mask_parameters['par_nco_IP8'])
-        my_dict_IP8['y_1']=np.abs(sep8v_m)
-        my_dict_IP8['y_2']=-np.abs(sep8v_m)
+        my_dict_IP8['y_1']=sep8v_m
+        my_dict_IP8['y_2']=-sep8v_m
         return np.abs(lumi.L(**my_dict_IP8) - L_target_ip8)
     sigma_x_b1_ip8=np.sqrt(twiss_dfs['lhcb1'].loc['ip8:1'].betx*mad.sequence.lhcb1.beam.ex)
     optres_ip8=least_squares(function_to_minimize_ip8, sigma_x_b1_ip8)
     mad.globals['on_sep8v'] = np.sign(mad.globals['on_sep8v']) * np.abs(optres_ip8['x'][0])*1e3
+    knob_parameters['par_sep8v']=mad.globals['on_sep8v']
 
     # Halo collision in IP2
     sigma_y_b1_ip2=np.sqrt(twiss_dfs['lhcb1'].loc['ip2:1'].bety*mad.sequence.lhcb1.beam.ey)
     mad.globals['on_sep2h']=np.sign(mad.globals['on_sep2h'])*mask_parameters['par_fullsep_in_sigmas_ip2']*sigma_y_b1_ip2/2*1e3
+    knob_parameters['par_sep2h']=mad.globals['on_sep2h']
 
     # Re-save knobs
     mad.input('exec, crossing_save')
@@ -417,7 +433,7 @@ twiss_dfs, other_data = ost.twiss_with_no_use(mad_track, [sequence_to_track],
         check_betas_at_ips=False, check_separations_at_ips=False)
 
 mad_track.globals['on_bb_charge']=1
-pd.DataFrame([mad_track.globals]).to_parquet(python_parameters['working_folder']+'/final_globals.parquet')
+pd.DataFrame([mad_track.globals]).to_parquet('final_globals.parquet')
 
 my_variables=mad_track.get_variables_dataframes()
 
@@ -430,11 +446,8 @@ pd.DataFrame([python_parameters]).to_pickle('final_python_parameters.pickle')
 pd.DataFrame([mask_parameters]).to_pickle('final_mask_parameters.pickle')
 pd.DataFrame([knob_parameters]).to_pickle('final_knob_parameters.pickle')
 
-import glob
 for f in glob.glob("*.tfs"):
     os.remove(f)
-
-os.chdir(python_parameters['parent_folder'])
 
 # Generate sixtrack
 if False:    
