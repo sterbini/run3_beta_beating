@@ -43,6 +43,15 @@ ip8_dict_new['beta_x1'],
 ip8_dict_new['y_1'],
 ))
 
+print(myLumi(ip8_dict_new['f'],
+ip8_dict_new['nb'],
+1.8e11,
+1.8e11,
+ip8_dict_new['energy_tot1'],
+ip8_dict_new['epsilon_x1'],
+ip8_dict_new['beta_x1'],
+ip8_dict_new['y_1'],
+))
 
 print(myLumi(ip8_dict_new['f'],
 ip8_dict_new['nb'],
