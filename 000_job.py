@@ -196,8 +196,8 @@ else:
     def function_to_minimize_ip8(sep8v_m):
         my_dict_IP8=lumi.get_luminosity_dict(
             mad, twiss_dfs, 'ip8', mask_parameters['par_nco_IP8'])
-        my_dict_IP8['y_1']=np.abs(sep8v_m)
-        my_dict_IP8['y_2']=-np.abs(sep8v_m)
+        my_dict_IP8['y_1']=sep8v_m
+        my_dict_IP8['y_2']=-sep8v_m
         return np.abs(lumi.L(**my_dict_IP8) - L_target_ip8)
     sigma_x_b1_ip8=np.sqrt(twiss_dfs['lhcb1'].loc['ip8:1'].betx*mad.sequence.lhcb1.beam.ex)
     optres_ip8=least_squares(function_to_minimize_ip8, sigma_x_b1_ip8)
@@ -223,7 +223,6 @@ else:
             mask_parameters['par_nco_IP1'], mask_parameters['par_nco_IP2'],
             mask_parameters['par_nco_IP5'], mask_parameters['par_nco_IP8'])
 
-    prrrr    
     import pandas as pd
     for ii in [1,2,5,8]:
         pd.DataFrame([lumi.get_luminosity_dict(mad, twiss_dfs, f'ip{ii}', mask_parameters[f'par_nco_IP{ii}'])]).to_parquet(f'lumi_dict_ip{ii}.parquet')
