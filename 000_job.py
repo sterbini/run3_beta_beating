@@ -34,7 +34,7 @@ if len(sys.argv) > 1:
     pm.make_links(force=True, links_dict={
     'parent_folder': python_parameters['parent_folder']})
     for ff in glob.glob('parent_folder/*.py'):
-	shutil.copyfile(ff, os.path.split(ff)[1])
+        shutil.copyfile(ff, os.path.split(ff)[1])
 
 Madx = pm.Madxp
 

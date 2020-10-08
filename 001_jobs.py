@@ -11,13 +11,13 @@ now = datetime.now()
 date_string = now.strftime("%Y.%m.%d.%H.%M.%S")
 
 my_list=[]
-
+logname=os.getenv("LOGNAME")
 from itertools import product
 
 for optics, mode, emittance in product(range(20,32), ['b1_with_bb','b4_from_b2_with_bb'], [2.5]):
     my_list.append({
         'parent_folder': os.getcwd(),
-	'working_folder': f'/eos/user/g/gsterb/run3_beta_beating/{date_string}_{mode[0:2]}_optics_{optics}_mixed_{emittance}',
+	'working_folder': f'/eos/user/{logname[0]}/{logname}/run3_beta_beating/{date_string}_{mode[0:2]}_optics_{optics}_mixed_{emittance}',
         'mode' : mode,
         'optics_file' : f'opticsfile.{optics}',
 	'emittance_um': emittance,
@@ -26,6 +26,11 @@ for optics, mode, emittance in product(range(20,32), ['b1_with_bb','b4_from_b2_w
 
 pd.DataFrame(my_list).to_pickle(f'./data/input_jobs_df.pickle')
 
+
+try:
+    os.symlink(f'/eos/user/{logname[0]}/{logname}/run3_beta_beating', 'link_to_eos')
+except:
+    print('EOS link exists.')
 
 mypath=os.getcwd()
 python_script=mypath+'/000_job.py'
