@@ -40,7 +40,7 @@ python_distribution='/afs/cern.ch/eng/tracking-tools/python_installations/activa
 
 myStudy = StudyObj(name='test',
 		   path=mypath,
-                   job_flavour='microcentury',
+                   job_flavour='longlunch',
                    python_script=python_script,
                    python_distribution=python_distribution,
                    python_dataframe=python_dataframe,

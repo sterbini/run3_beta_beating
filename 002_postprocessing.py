@@ -1,7 +1,7 @@
 import pandas as pd
 import bokeh
 
-jobs_df=pd.read_pickle('data/input_jobs_df.pickle')
+jobs_df=pd.read_pickle('/eos/user/g/gsterb/run3_beta_beating/2020.10.08.09.28.48_b1_optics_20_mixed_2.5/input_jobs_df.pickle')
 b1_df=jobs_df[jobs_df['mode']=='b1_with_bb'].copy()
 b2_df=jobs_df[jobs_df['mode']=='b4_from_b2_with_bb'].copy()
 
@@ -51,7 +51,7 @@ def get_final_twiss(df, bb=False):
     return pd.concat(my_list)
 
 ### 
-beam='b2'
+beam='b1'
 
 
 if beam=='b1':
