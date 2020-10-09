@@ -14,7 +14,7 @@ my_list=[]
 logname=os.getenv("LOGNAME")
 from itertools import product
 
-for optics, mode, emittance in product(range(20,32), ['b1_with_bb','b4_from_b2_with_bb'], [2.5]):
+for optics, mode, emittance in product(range(20,32), ['b1_with_bb','b4_from_b2_with_bb'], [1.8]):
     my_list.append({
         'parent_folder': os.getcwd(),
 	'working_folder': f'/eos/user/{logname[0]}/{logname}/run3_beta_beating/{date_string}_{mode[0:2]}_optics_{optics}_mixed_{emittance}',
@@ -44,7 +44,7 @@ myStudy = StudyObj(name='test',
                    python_script=python_script,
                    python_distribution=python_distribution,
                    python_dataframe=python_dataframe,
-                   arguments='$(ProcId)', queue=len(pd.read_pickle(python_dataframe)))
+                   arguments='$(ProcId)', queue=len(pd.read_pickle(python_dataframe)), request_cpus=2)
 
 myStudy.describe()
 
