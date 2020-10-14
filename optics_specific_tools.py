@@ -12,8 +12,8 @@ now = datetime.now()
 def get_python_parameters(job_row):
     python_parameters= {
         'working_folder' : 'test',
-        #'mode' : 'b1_with_bb',
-        'mode' : 'b4_from_b2_with_bb',
+        'mode' : 'b1_with_bb',
+        #'mode' : 'b4_from_b2_with_bb',
         'optics_file' : 'opticsfile.20',
         'filling_pattern' : 'filling_scheme_mixed',
         # Tolerances for checks [ip1, ip2, ip5, ip8]
@@ -25,8 +25,9 @@ def get_python_parameters(job_row):
         # tolerance for the sanity check of the flat orbit machine
         'flat_tol' : 1e-6,
         'lumi_levelling_ip15' : True,
-        'emittance_um' : 2.5,
+        'emittance_um' : 1.8,
         'clipped_intensity': True,
+        'use_sofia_fit_for_emittance': True,
     	'date_string': now.strftime("%Y.%m.%d.%H.%M.%S"), 
     }
 
@@ -42,7 +43,13 @@ def get_python_parameters(job_row):
         python_parameters['working_folder']=job_row['working_folder']
         python_parameters['date_string']=job_row['date_string']
 
-
+    if (python_parameters['emittance_um']==1.8) and (python_parameters['use_sofia_fit_for_emittance']):
+        if python_parameters["filling_pattern"]=='filling_scheme_mixed': 
+            emittance_df=pd.read_pickle(f'{python_parameters["parent_folder"]}/data/varying_emit_2484.pickle') 
+        else:
+            emittance_df=pd.read_pickle(f'{python_parameters["parent_folder"]}/data/varying_emit_2736.pickle') 
+        python_parameters['emittance_um']= emittance_df[emittance_df['optics']==python_parameters['optics_file']].emit_tot.values[0]*1e6;    
+    
     patt = fp.FillingPattern.from_json(f'{python_parameters["parent_folder"]}/data/input_{python_parameters["filling_pattern"]}.json')
 
     python_parameters['filling_pattern_handle']=patt
@@ -56,16 +63,16 @@ def get_python_parameters(job_row):
 
     return python_parameters
 
-def sigma_from_tables(optics_file, emittance_um, filling_scheme, parent_folder):
+def sigma_from_tables(optics_file, emittance_um, filling_scheme, parent_folder, use_sofia_fit_for_emittance):
     if filling_scheme=='filling_scheme_mixed':
-        if emittance_um==1.8:
+        if emittance_um==1.8 or use_sofia_fit_for_emittance:
             sigma_df=pd.read_pickle(f'{parent_folder}/data/input_params_2484_1.8.pickle')
         elif emittance_um==2.5:
             sigma_df=pd.read_pickle(f'{parent_folder}/data/input_params_2484_2.5.pickle')
         else:
             assert False
     elif filling_scheme=='filling_scheme_bcms':
-        if emittance_um==1.8:
+        if emittance_um==1.8 or use_sofia_fit_for_emittance:
             sigma_df=pd.read_pickle(f'{parent_folder}/data/input_params_2736_1.8.pickle')
         elif emittance_um==2.5:
             sigma_df=pd.read_pickle(f'{parent_folder}/data/input_params_2736_2.5.pickle')
@@ -148,7 +155,11 @@ def get_mask_parameters(python_parameters):
     'par_on_errors_MCBXF'      : 0,
     }
 
-    mask_parameters['par_beam_sigt']=sigma_from_tables(python_parameters['optics_file'], mask_parameters['par_beam_norm_emit'], python_parameters['filling_pattern'], python_parameters['parent_folder'])
+    mask_parameters['par_beam_sigt']=sigma_from_tables(python_parameters['optics_file'], 
+        mask_parameters['par_beam_norm_emit'],
+        python_parameters['filling_pattern'],
+        python_parameters['parent_folder'],
+        python_parameters['use_sofia_fit_for_emittance'])
     return mask_parameters
 
 def get_knob_parameters():
@@ -503,3 +514,15 @@ def filter_bb_df(bb_df, bb_schedule_to_track):
 
     aux=pd.concat([bb_df_ho, lr_ATLAS, lr_ALICE, lr_CMS, lr_LHCB])
     return aux
+
+
+def L_no_disp(my_dictionary):
+    my_dictionary['dx_1']=0
+    my_dictionary['dy_1']=0
+    my_dictionary['dpx_1']=0
+    my_dictionary['dpy_1']=0
+    my_dictionary['dx_2']=0
+    my_dictionary['dy_2']=0
+    my_dictionary['dpx_2']=0
+    my_dictionary['dpy_2']=0
+    return pm.luminosity.L(**my_dictionary) 

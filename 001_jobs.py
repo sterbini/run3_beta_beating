@@ -14,7 +14,7 @@ my_list=[]
 logname=os.getenv("LOGNAME")
 from itertools import product
 
-for optics, mode, emittance in product(range(20,32), ['b1_with_bb','b4_from_b2_with_bb'], [1.8]):
+for optics, mode, emittance in product(range(20,31), ['b1_with_bb','b4_from_b2_with_bb'], [1.8]):
     my_list.append({
         'parent_folder': os.getcwd(),
 	'working_folder': f'/eos/user/{logname[0]}/{logname}/run3_beta_beating/{date_string}_{mode[0:2]}_optics_{optics}_mixed_{emittance}',
@@ -23,6 +23,7 @@ for optics, mode, emittance in product(range(20,32), ['b1_with_bb','b4_from_b2_w
 	'emittance_um': emittance,
 	'date_string':date_string,
         })
+
 
 pd.DataFrame(my_list).to_pickle(f'./data/input_jobs_df.pickle')
 
@@ -40,7 +41,7 @@ python_distribution='/afs/cern.ch/eng/tracking-tools/python_installations/activa
 
 myStudy = StudyObj(name='test',
 		   path=mypath,
-                   job_flavour='longlunch',
+                   job_flavour='microcentury',
                    python_script=python_script,
                    python_distribution=python_distribution,
                    python_dataframe=python_dataframe,

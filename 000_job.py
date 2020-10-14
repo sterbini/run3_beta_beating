@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import glob
 import shutil
+import gc 
 
 if len(sys.argv) > 1:
     job_df = pd.read_pickle(sys.argv[1])
@@ -94,7 +95,9 @@ mad.set_variables_from_dict(params=mask_parameters)
 
 # Prepare sequences and attach beam
 mad.call("modules/submodule_01a_preparation.madx")
+gc.collect()
 mad.call("modules/submodule_01b_beam.madx")
+gc.collect()
 
 # Test machine before any change
 twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
@@ -103,9 +106,11 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         save_twiss_files=save_intermediate_twiss,
         check_betas_at_ips=check_betas_at_ips,
         check_separations_at_ips=check_separations_at_ips)
+gc.collect()
 
 # Set phase, apply and save crossing
 mad.call("modules/submodule_01c_phase.madx")
+gc.collect()
 
 # Set optics-specific knobs
 ost.set_optics_specific_knobs(mad, mode)
@@ -113,6 +118,7 @@ ost.set_optics_specific_knobs(mad, mode)
 # Crossing-save and some reference measurements
 mad.input('exec, crossing_save')
 mad.call("modules/submodule_01e_final.madx")
+gc.collect()
 
 # Test flat machine
 mad.input('exec, crossing_disable')
@@ -121,6 +127,7 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         twiss_fname='twiss_no_crossing',
         save_twiss_files=save_intermediate_twiss,
         check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=check_separations_at_ips)
+gc.collect()
 # Check flatness
 flat_tol = python_parameters['flat_tol']
 for ss in twiss_dfs.keys():
@@ -135,6 +142,7 @@ twiss_dfs, other_data = ost.twiss_and_check(mad, sequences_to_check,
         twiss_fname='twiss_with_crossing',
         save_twiss_files=save_intermediate_twiss,
         check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=check_separations_at_ips)
+gc.collect()
 
 mad.use(f'lhcb{beam_to_configure}')
 
@@ -187,7 +195,9 @@ else:
         my_dict_IP5['N2']=n_part
         my_dict_IP5['px_1']=crossing_angle*1e-6
         my_dict_IP5['px_2']=-crossing_angle*1e-6
-        return lumi.L(**my_dict_IP1)+lumi.L(**my_dict_IP5)-2*L_target
+
+        return ost.L_no_disp(my_dict_IP1)+ost.L_no_disp(my_dict_IP5)-2*L_target
+
     
     if python_parameters['lumi_levelling_ip15']:
         aux=least_squares(function_to_minimize_IP15, starting_guess)
@@ -212,7 +222,7 @@ else:
             mad, twiss_dfs, 'ip8', mask_parameters['par_nco_IP8'])
         my_dict_IP8['y_1']=sep8v_m
         my_dict_IP8['y_2']=-sep8v_m
-        return np.abs(lumi.L(**my_dict_IP8) - L_target_ip8)
+        return np.abs(ost.L_no_disp(my_dict_IP8) - L_target_ip8)
     sigma_x_b1_ip8=np.sqrt(twiss_dfs['lhcb1'].loc['ip8:1'].betx*mad.sequence.lhcb1.beam.ex)
     optres_ip8=least_squares(function_to_minimize_ip8, sigma_x_b1_ip8)
     mad.globals['on_sep8v'] = np.sign(mad.globals['on_sep8v']) * np.abs(optres_ip8['x'][0])*1e3
@@ -240,9 +250,10 @@ else:
     import pandas as pd
     for ii in [1,2,5,8]:
         pd.DataFrame([lumi.get_luminosity_dict(mad, twiss_dfs, f'ip{ii}', mask_parameters[f'par_nco_IP{ii}'])]).to_parquet(f'lumi_dict_ip{ii}.parquet')
-        python_parameters[f'L_IP{ii}']=lumi.L(**lumi.get_luminosity_dict(mad, twiss_dfs, f'ip{ii}', mask_parameters[f'par_nco_IP{ii}']))
+        python_parameters[f'L_IP{ii}']=ost.L_no_disp(lumi.get_luminosity_dict(mad, twiss_dfs, f'ip{ii}', mask_parameters[f'par_nco_IP{ii}']))
 
 mad.input('on_disp = 0')
+gc.collect()
 
 # Prepare bb dataframes
 if enable_bb_python:
@@ -279,6 +290,7 @@ if generate_b4_from_b2:
             twiss_fname='twiss_b2_for_b4check',
             save_twiss_files=save_intermediate_twiss,
             check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
+    gc.collect()
 
     twiss_dfs_b4, other_data_b4 = ost.twiss_and_check(mad_b4,
             sequences_to_check=['lhcb2'],
@@ -286,6 +298,7 @@ if generate_b4_from_b2:
             twiss_fname='twiss_b4_for_b4check',
             save_twiss_files=save_intermediate_twiss,
             check_betas_at_ips=check_betas_at_ips, check_separations_at_ips=False)
+    gc.collect()
 
 
 
